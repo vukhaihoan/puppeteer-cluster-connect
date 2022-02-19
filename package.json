@@ -1,7 +1,7 @@
 {
-  "name": "puppeteer-cluster",
-  "version": "0.23.0",
-  "description": "Cluster management for puppeteer",
+  "name": "puppeteer-cluster-connect",
+  "version": "0.0.1",
+  "description": "Puppeteer Cluster that support puppeteer connect (puppeteer.connect) , Current Only Support Connect method, use puppeteer-cluster package to use Launch method",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -10,12 +10,12 @@
     "coverage": "jest --coverage",
     "dev": "tsc --watch"
   },
-  "author": "Thomas Dondorf",
+  "author": "Vu Khai Hoan",
   "repository": {
     "type": "git",
-    "url": "https://github.com/thomasdondorf/puppeteer-cluster.git"
+    "url": "https://github.com/vukhaihoan/puppeteer-cluster-connect.git"
   },
-  "homepage": "https://github.com/thomasdondorf/puppeteer-cluster",
+  "homepage": "https://github.com/vukhaihoan/puppeteer-cluster-connect",
   "keywords": [
     "puppeteer",
     "cluster",
@@ -23,7 +23,8 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "debug": "^4.3.3"
+    "debug": "^4.3.3",
+    "puppeteer-cluster": "^0.23.0"
   },
   "peerDependencies": {
     "puppeteer": ">=1.5.0"
