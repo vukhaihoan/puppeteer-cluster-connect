@@ -9,6 +9,7 @@ import { Page, LaunchOptions, ConnectOptions } from "puppeteer";
 export default abstract class ConcurrencyImplementation {
     protected options: LaunchOptions & ConnectOptions;
     protected puppeteer: any;
+    protected restartFunction: () => Promise<string>;
 
     /**
      * @param options  Options that should be provided to puppeteer.launch
@@ -16,10 +17,12 @@ export default abstract class ConcurrencyImplementation {
      */
     public constructor(
         options: LaunchOptions & ConnectOptions,
-        puppeteer: any
+        puppeteer: any,
+        restartFunction: () => Promise<string>
     ) {
         this.options = options;
         this.puppeteer = puppeteer;
+        this.restartFunction = restartFunction;
     }
 
     /**
@@ -36,7 +39,8 @@ export default abstract class ConcurrencyImplementation {
      * Creates a worker and returns it
      */
     public abstract workerInstance(
-        perBrowserOptions: (LaunchOptions & ConnectOptions) | undefined
+        perBrowserOptions: (LaunchOptions & ConnectOptions) | undefined,
+        restartFunction: (() => Promise<string>) | undefined
     ): Promise<WorkerInstance>;
 }
 
@@ -81,5 +85,6 @@ export interface ResourceData {
 
 export type ConcurrencyImplementationClassType = new (
     options: LaunchOptions & ConnectOptions,
-    puppeteer: any
+    puppeteer: any,
+    restartFunction: () => Promise<string>
 ) => ConcurrencyImplementation;

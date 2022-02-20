@@ -15,7 +15,8 @@ export default class Browser extends ConcurrencyImplementation {
     public async workerInstance(
         perBrowserOptions:
             | (puppeteer.LaunchOptions & puppeteer.ConnectOptions)
-            | undefined
+            | undefined,
+        restartFunction: () => Promise<string>
     ): Promise<WorkerInstance> {
         const options = perBrowserOptions || this.options;
         // let chrome = await this.puppeteer.launch(options) as puppeteer.Browser;
@@ -30,8 +31,8 @@ export default class Browser extends ConcurrencyImplementation {
                 await timeoutExecute(
                     BROWSER_TIMEOUT,
                     (async () => {
-                        // context = await chrome.createIncognitoBrowserContext();
-                        context = await chrome.browserContexts()[0];
+                        context = await chrome.createIncognitoBrowserContext();
+                        // context = await chrome.browserContexts()[0];
                         page = await context.newPage();
                     })()
                 );
@@ -60,6 +61,7 @@ export default class Browser extends ConcurrencyImplementation {
 
                 // just relaunch as there is only one page per browser
                 // chrome = await this.puppeteer.launch(options);
+                options.browserWSEndpoint = await this.restartFunction();
                 chrome = await this.puppeteer.connect(options);
             },
         };

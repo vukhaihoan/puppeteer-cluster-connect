@@ -18,9 +18,10 @@ export default abstract class SingleBrowserImplementation extends ConcurrencyImp
 
     public constructor(
         options: puppeteer.LaunchOptions & puppeteer.ConnectOptions,
-        puppeteer: any
+        puppeteer: any,
+        restartFunction: () => Promise<string>
     ) {
-        super(options, puppeteer);
+        super(options, puppeteer, restartFunction);
     }
 
     private async repair() {
@@ -46,11 +47,13 @@ export default abstract class SingleBrowserImplementation extends ConcurrencyImp
             // this.browser = (await this.puppeteer.launch(
             //     this.options
             // )) as puppeteer.Browser;
+            this.options.browserWSEndpoint = await this.restartFunction();
+            console.log(this.options);
             this.browser = (await this.puppeteer.connect(
                 this.options
             )) as puppeteer.Browser;
         } catch (err) {
-            throw new Error("Unable to restart chrome.");
+            console.log(err);
         }
         this.repairRequested = false;
         this.repairing = false;
@@ -60,6 +63,8 @@ export default abstract class SingleBrowserImplementation extends ConcurrencyImp
 
     public async init() {
         // this.browser = await this.puppeteer.launch(this.options);
+        console.log("init");
+        console.log(this.options);
         this.browser = await this.puppeteer.connect(this.options);
     }
 

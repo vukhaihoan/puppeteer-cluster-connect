@@ -35,6 +35,8 @@ interface ClusterOptions {
     skipDuplicateUrls: boolean;
     sameDomainDelay: number;
     puppeteer: any;
+    restartFunction: () => Promise<string>;
+    perRestartFunction: (() => Promise<string>)[] | undefined;
 }
 
 type Partial<T> = {
@@ -58,6 +60,8 @@ const DEFAULT_OPTIONS: ClusterOptions = {
     skipDuplicateUrls: false,
     sameDomainDelay: 0,
     puppeteer: undefined,
+    restartFunction: () => Promise.resolve(""),
+    perRestartFunction: undefined,
 };
 
 interface TaskFunctionArguments<JobData> {
@@ -88,6 +92,8 @@ export default class Cluster<
     private perBrowserOptions:
         | (PuppeteerNodeLaunchOptions & ConnectOptions)[]
         | null = null;
+    private perRestartFunction: (() => Promise<string>)[] | null = null;
+
     private workers: Worker<JobData, ReturnData>[] = [];
     private workersAvail: Worker<JobData, ReturnData>[] = [];
     private workersBusy: Worker<JobData, ReturnData>[] = [];
@@ -152,6 +158,7 @@ export default class Cluster<
 
     private async init() {
         const browserOptions = this.options.puppeteerOptions;
+        const restartFunction = this.options.restartFunction;
         let puppeteer = this.options.puppeteer;
 
         if (this.options.puppeteer == null) {
@@ -164,22 +171,26 @@ export default class Cluster<
         if (this.options.concurrency === Cluster.CONCURRENCY_PAGE) {
             this.browser = new builtInConcurrency.Page(
                 browserOptions,
-                puppeteer
+                puppeteer,
+                restartFunction
             );
         } else if (this.options.concurrency === Cluster.CONCURRENCY_CONTEXT) {
             this.browser = new builtInConcurrency.Context(
                 browserOptions,
-                puppeteer
+                puppeteer,
+                restartFunction
             );
         } else if (this.options.concurrency === Cluster.CONCURRENCY_BROWSER) {
             this.browser = new builtInConcurrency.Browser(
                 browserOptions,
-                puppeteer
+                puppeteer,
+                restartFunction
             );
         } else if (typeof this.options.concurrency === "function") {
             this.browser = new this.options.concurrency(
                 browserOptions,
-                puppeteer
+                puppeteer,
+                restartFunction
             );
         } else {
             throw new Error(
@@ -190,6 +201,7 @@ export default class Cluster<
         if (typeof this.options.maxConcurrency !== "number") {
             throw new Error("maxConcurrency must be of number type");
         }
+
         if (
             this.options.perBrowserOptions &&
             this.options.perBrowserOptions.length !==
@@ -201,6 +213,19 @@ export default class Cluster<
         }
         if (this.options.perBrowserOptions) {
             this.perBrowserOptions = [...this.options.perBrowserOptions];
+        }
+
+        if (
+            this.options.perRestartFunction &&
+            this.options.perRestartFunction.length !==
+                this.options.maxConcurrency
+        ) {
+            throw new Error(
+                "perRestartFunction length must equal maxConcurrency"
+            );
+        }
+        if (this.options.perRestartFunction) {
+            this.perRestartFunction = [...this.options.perRestartFunction];
         }
 
         try {
@@ -233,6 +258,10 @@ export default class Cluster<
         if (this.perBrowserOptions && this.perBrowserOptions.length > 0) {
             nextWorkerOption = this.perBrowserOptions.shift();
         }
+        let nextWorkerRestartFunction;
+        if (this.perRestartFunction && this.perRestartFunction.length > 0) {
+            nextWorkerRestartFunction = this.perRestartFunction.shift();
+        }
 
         const workerId = this.nextWorkerId;
 
@@ -240,7 +269,7 @@ export default class Cluster<
         try {
             workerBrowserInstance = await (
                 this.browser as ConcurrencyImplementation
-            ).workerInstance(nextWorkerOption);
+            ).workerInstance(nextWorkerOption, nextWorkerRestartFunction);
         } catch (err: any) {
             throw new Error(
                 `Unable to launch browser for worker, error message: ${err.message}`
