@@ -63,7 +63,6 @@ export default abstract class SingleBrowserImplementation extends ConcurrencyImp
 
     public async init() {
         // this.browser = await this.puppeteer.launch(this.options);
-        console.log("init");
         console.log(this.options);
         this.browser = await this.puppeteer.connect(this.options);
     }
