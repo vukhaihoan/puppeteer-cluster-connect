@@ -23,7 +23,7 @@ Array restart function is current in development
 
 ## Usage
 
-The following is a typical example of using puppeteer-cluster. A cluster is created with 2 concurrent workers. Then a task is defined which includes going to the URL and taking a screenshot. We then queue two jobs and wait for the cluster to finish.
+The following is a typical example of using puppeteer-cluster-connect. A cluster is created with 2 concurrent workers. Then a task is defined which includes going to the URL and taking a screenshot. We then queue three jobs and wait for the cluster to finish.
 
 ```js
 const { Cluster } = require("../dist");
@@ -37,9 +37,9 @@ const ws = async () => {
         defaultViewport: null,
         args: [
             "--start-maximized", // you can also use '--start-fullscreen'
-            "--disable-web-security",
-            "--disable-site-isolation-trials",
-            "--disable-application-cache",
+            // "--disable-web-security",
+            // "--disable-site-isolation-trials",
+            // "--disable-application-cache",
             // "--user-data-dir=C:\\Users\\vukhaihoan\\AppData\\Local\\Google\\Chrome\\User Data",
             // "--profile-directory=Profile 2",
         ],
@@ -59,13 +59,9 @@ const ws = async () => {
         const cluster = await Cluster.connect({
             concurrency: Cluster.CONCURRENCY_BROWSER,
             maxConcurrency: 2,
-
             // provide the puppeteer-core library
             puppeteer,
-            // and provide executable path (in this case for a Chrome installation in Ubuntu)
             puppeteerOptions: {
-                // executablePath: 'google-chrome-stable',
-                // headless: false,
                 browserWSEndpoint: await ws(),
                 // defaultViewport: null,
             },
@@ -84,9 +80,11 @@ const ws = async () => {
         });
 
         await cluster.task(async ({ page, data: url }) => {
-            console.log("chay : " + url);
+            console.log("run : " + url);
             await page.goto(url);
             console.log("went to: " + url);
+            const screen = await page.screenshot();
+            // Store screenshot, do something else
         });
 
         cluster.queue("https://www.google.com");
