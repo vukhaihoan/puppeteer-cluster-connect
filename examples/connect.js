@@ -1,19 +1,15 @@
-const { Cluster } = require("../dist");
+const { Cluster } = require("puppeteer-cluster-connect");
 const puppeteer = require("puppeteer-core"); // use puppeteer-core instead of puppeteer
 const puppeteerRemote = require("puppeteer");
-// delay function
+// restart function
 const ws = async () => {
     console.log("create browser");
     const browser = await puppeteerRemote.launch({
         headless: false,
         defaultViewport: null,
         args: [
-            "--start-maximized", // you can also use '--start-fullscreen'
-            // "--disable-web-security",
-            // "--disable-site-isolation-trials",
-            // "--disable-application-cache",
-            // "--user-data-dir=C:\\Users\\vukhaihoan\\AppData\\Local\\Google\\Chrome\\User Data",
-            // "--profile-directory=Profile 2",
+            "--start-maximized",
+            // add other if you want
         ],
         executablePath:
             "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
@@ -37,7 +33,9 @@ const ws = async () => {
                 browserWSEndpoint: await ws(),
                 // defaultViewport: null,
             },
+            // Put restart function callback here
             restartFunction: ws,
+            // current in development
             // perBrowserOptions: [
             //     {
             //         browserWSEndpoint: await ws(),
