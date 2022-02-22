@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-cluster-connect",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Puppeteer Cluster that support puppeteer connect (puppeteer.connect) , Current Only Support Connect method, use puppeteer-cluster package to use Launch method",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -24,8 +24,7 @@
   "license": "MIT",
   "dependencies": {
     "debug": "^4.3.3",
-    "puppeteer-cluster": "^0.23.0",
-    "puppeteer-cluster-connect": "^0.0.5"
+    "puppeteer-cluster": "^0.23.0"
   },
   "peerDependencies": {
     "puppeteer": ">=1.5.0"

@@ -1,4 +1,4 @@
-const { Cluster } = require("puppeteer-cluster-connect");
+const { Cluster } = require("../dist");
 const puppeteer = require("puppeteer-core"); // use puppeteer-core instead of puppeteer
 const puppeteerRemote = require("puppeteer");
 // restart function
