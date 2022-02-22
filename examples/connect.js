@@ -9,9 +9,9 @@ const ws = async () => {
         defaultViewport: null,
         args: [
             "--start-maximized", // you can also use '--start-fullscreen'
-            "--disable-web-security",
-            "--disable-site-isolation-trials",
-            "--disable-application-cache",
+            // "--disable-web-security",
+            // "--disable-site-isolation-trials",
+            // "--disable-application-cache",
             // "--user-data-dir=C:\\Users\\vukhaihoan\\AppData\\Local\\Google\\Chrome\\User Data",
             // "--profile-directory=Profile 2",
         ],
@@ -31,13 +31,9 @@ const ws = async () => {
         const cluster = await Cluster.connect({
             concurrency: Cluster.CONCURRENCY_BROWSER,
             maxConcurrency: 2,
-
             // provide the puppeteer-core library
             puppeteer,
-            // and provide executable path (in this case for a Chrome installation in Ubuntu)
             puppeteerOptions: {
-                // executablePath: 'google-chrome-stable',
-                // headless: false,
                 browserWSEndpoint: await ws(),
                 // defaultViewport: null,
             },
@@ -56,9 +52,11 @@ const ws = async () => {
         });
 
         await cluster.task(async ({ page, data: url }) => {
-            console.log("chay : " + url);
+            console.log("run : " + url);
             await page.goto(url);
             console.log("went to: " + url);
+            const screen = await page.screenshot();
+            // Store screenshot, do something else
         });
 
         cluster.queue("https://www.google.com");

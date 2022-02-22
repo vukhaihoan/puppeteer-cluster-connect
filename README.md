@@ -21,12 +21,17 @@ Current support : one restart function
 
 Array restart function is current in development
 
+## full document please go to :
+
+[puppeteer-cluster](https://github.com/thomasdondorf/puppeteer-cluster)
+(use connect instead of launch and add `restartFunction` if you want restart endpoint after crash or error)
+
 ## Usage
 
 The following is a typical example of using puppeteer-cluster-connect. A cluster is created with 2 concurrent workers. Then a task is defined which includes going to the URL and taking a screenshot. We then queue three jobs and wait for the cluster to finish.
 
 ```js
-const { Cluster } = require("../dist");
+const { Cluster } = require("puppeteer-cluster-connect");
 const puppeteer = require("puppeteer-core"); // use puppeteer-core instead of puppeteer
 const puppeteerRemote = require("puppeteer");
 // delay function
