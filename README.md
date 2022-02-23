@@ -1,4 +1,5 @@
 # Puppeteer cluster Connect
+[![npm](https://img.shields.io/npm/v/puppeteer-cluster-connect)](https://www.npmjs.com/package/puppeteer-cluster-connect)
 
 Use Cluster.connect instead on Cluster.launch
 
